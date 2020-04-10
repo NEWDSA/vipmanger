@@ -17,13 +17,42 @@
   </div>
 </template>
 <script>
+import { logout } from "@/api/login";
 export default {
   methods: {
-    handleCommand (command) {
-      this.$message(`點擊了${command}`)
+    handleCommand(command) {
+      switch (command) {
+        case "a":
+          //修改密碼
+          this.$message(`點擊了修改密碼`);
+          break;
+        case "b":
+          //退出系統
+          //獲取token
+          logout(localStorage.getItem("luciano-msg-token")).then(res => {
+            const resp = res.data;
+            if (resp.flag) {
+              //退出成功
+              //清除本地數據
+              localStorage.removeItem("luciano-msg-token");
+              localStorage.removeItem("luciano-msm-user");
+              //回到登録頁面重新登録
+              this.$router.push("/login");
+            } else {
+              this.$message({
+                message: resp.message,
+                type: "warning",
+                duration: 500 //彈出停留時間 0.5秒
+              });
+            }
+          });
+          break;
+        default:
+          break;
+      }
     }
   }
-}
+};
 </script>
  <style lang="scss" scoped>
 .logo {

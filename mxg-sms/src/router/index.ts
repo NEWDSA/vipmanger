@@ -59,7 +59,7 @@ const routes: Array<RouteConfig> = [
       {
         path:'/',  // /member/
         component:Goods,
-        meta:{title:'供应商管理'}
+        meta:{title:'商品管理'}
       }
     ]
   },
