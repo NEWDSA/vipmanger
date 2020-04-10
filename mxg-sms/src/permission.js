@@ -8,47 +8,44 @@
  */
 import router from './router'
 import { getUserInfo } from './api/login'
-//路由前置
+// 路由前置
 router.beforeEach((to, from, next) => {
-    //1.獲取token
-    const token = localStorage.getItem("luciano-msg-token")
-    //1.1.如果沒有獲取到token,
-    if (!token) {
-        //要訪問非登陸頁面，則不讓訪問，回到登録頁面 /login
-        if (to.path !== '/login') {
-            next({ path: '/login' })
-        } else {
-            next();
-        }
+  // 1.獲取token
+  const token = localStorage.getItem('luciano-msg-token')
+  // 1.1.如果沒有獲取到token,
+  if (!token) {
+    // 要訪問非登陸頁面，則不讓訪問，回到登録頁面 /login
+    if (to.path !== '/login') {
+      next({ path: '/login' })
     } else {
-        //1.2.如果獲取到token
-        if (to.path === "/login") {
-            //1.2.1 請求路由 /login，那就去目標路由
-            next()
-        } else {
-            //1.2.2 請求路由非登陸頁面，先在本地查看是否有用戶信息,
-            const userInfo = localStorage.getItem("luciano-msm-user");
-            if (userInfo) {
-                //本地獲取到，則直接讓它去目標路由
-                next()
-            } else {
-                //如果本地沒有用戶信息，就通過token去獲取用戶信息
-                getUserInfo(token).then(res => {
-                    const resp = res.data
-                    if (resp.flag) {
-                        //如果獲取到用戶信息，則進入非登録頁面，否則沒有獲取到登録信息，則進入登録頁面
-                        //保存到本地
-                        localStorage.setItem("luciano-msm-user", JSON.stringify(resp.data));
-                        next()
-                    }else{
-                        //未獲取到用戶信息，重新登録
-                        next({path:'/login'})
-                    }
-                })
-            }
-
-        }
-
+      next()
     }
-
-}) 
+  } else {
+    // 1.2.如果獲取到token
+    if (to.path === '/login') {
+      // 1.2.1 請求路由 /login，那就去目標路由
+      next()
+    } else {
+      // 1.2.2 請求路由非登陸頁面，先在本地查看是否有用戶信息,
+      const userInfo = localStorage.getItem('luciano-msm-user')
+      if (userInfo) {
+        // 本地獲取到，則直接讓它去目標路由
+        next()
+      } else {
+        // 如果本地沒有用戶信息，就通過token去獲取用戶信息
+        getUserInfo(token).then(res => {
+          const resp = res.data
+          if (resp.flag) {
+            // 如果獲取到用戶信息，則進入非登録頁面，否則沒有獲取到登録信息，則進入登録頁面
+            // 保存到本地
+            localStorage.setItem('luciano-msm-user', JSON.stringify(resp.data))
+            next()
+          } else {
+            // 未獲取到用戶信息，重新登録
+            next({ path: '/login' })
+          }
+        })
+      }
+    }
+  }
+})
