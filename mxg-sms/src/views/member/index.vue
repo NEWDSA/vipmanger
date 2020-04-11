@@ -23,21 +23,34 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      @size-change="fetchData"
+      @current-change="fetchData"
+      :current-page="currentPage"
+      :page-sizes="[10, 20,50]"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total=total>
+    </el-pagination>
   </div>
 </template>
 <script>
 import memberApi from '@/api/member'
 // 支付類型
 const payTypeOptions = [
-  { type: '1', name :'現金' },
-  { type: '2', name :'微信' },
-  { type: '3', name :'支付寶' },
-  { type: '4', name :'銀行卡' }
+  { type: '1', name: '現金' },
+  { type: '2', name: '微信' },
+  { type: '3', name: '支付寶' },
+  { type: '4', name: '銀行卡' }
 ]
 export default {
   data () {
     return {
-      list: []
+      list: [],
+      total: 0, // 总记录数
+      currentPage: 1, // 当前页码
+      pageSize: 10, // 每一页显示10条数据,
+      searchMap: {}// 条件查询绑定的条件值
     }
   },
   created () {
@@ -46,10 +59,14 @@ export default {
   },
   methods: {
     fetchData () {
-      memberApi.getList().then(res => {
+      // memberApi.getList().then(res => {
+      // 调用分页查询数据
+      memberApi.search(this.currentPage, this.pageSize, this.searchMap).then(res => {
         const resp = res.data
-        console.log(resp)
-        this.list = resp.data
+        // alert(JSON.stringify(resp.data))
+        console.log(resp.data.row)
+        this.list = resp.data.row
+        this.total=resp.data.total
       })
     },
     // 編輯
@@ -64,11 +81,10 @@ export default {
   // 定義過濾器
   filters: {
     payTypeFilter (type) {
-
       // payTypeOptions.find(obj=>{
       //   obj.type===type
       // })
-      //在過濾器當中不能引用當前實例 this
+      // 在過濾器當中不能引用當前實例 this
       const payObj = payTypeOptions.find(obj => obj.type === type)
 
       return payObj ? payObj.name : null
